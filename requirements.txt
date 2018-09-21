@@ -1,0 +1,2 @@
+  google/googletest@release-1.8.1 --test
+  Tencent/rapidjson@v1.1.0 -DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_EXAMPLES=OFF -DRAPIDJSON_BUILD_TESTS=OFF

@@ -1,0 +1,8 @@
+//
+// Created by Peyman Mortazavi on 9/21/18.
+//
+
+#ifndef GARLICCONFIG_GARLICCONFIG_H
+#define GARLICCONFIG_GARLICCONFIG_H
+
+#endif //GARLICCONFIG_GARLICCONFIG_H
