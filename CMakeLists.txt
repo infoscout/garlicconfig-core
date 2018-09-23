@@ -9,9 +9,11 @@ ENDIF()
 set(CMAKE_CXX_STANDARD 17)
 
 # Sources.
-set(PUBLIC_HEADERS include/garlicconfig.h)
+set(PUBLIC_HEADERS include/garlicconfig.h include/repository.h include/exceptions.h)
 set(SOURCE_FILES
-        ${PUBLIC_HEADERS} src/hello.cpp)
+        ${PUBLIC_HEADERS} src/hello.cpp src/repository.cpp)
+
+find_package(Boost 1.68.0 REQUIRED COMPONENTS filesystem)
 
 # Library
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
@@ -22,6 +24,8 @@ target_include_directories(
         "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>")
 include_directories(${PROJECT_NAME} src)
 include_directories(${PROJECT_NAME} include)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
 
 # Installation

@@ -5,4 +5,7 @@
 #ifndef GARLICCONFIG_GARLICCONFIG_H
 #define GARLICCONFIG_GARLICCONFIG_H
 
+#include "exceptions.h"
+#include "repository.h"
+
 #endif //GARLICCONFIG_GARLICCONFIG_H
