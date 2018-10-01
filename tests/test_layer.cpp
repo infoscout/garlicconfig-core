@@ -128,7 +128,7 @@ TEST(LayerTests, ListValueTests) {
 
   list_value.remove(1);
 
-  for(auto it = list_value.begin_elements(); it != list_value.end_elements(); ++it) {
+  for(auto it = list_value.begin_element(); it != list_value.end_element(); ++it) {
     ASSERT_EQ((*it)->get_int(), 25);
   }
 }

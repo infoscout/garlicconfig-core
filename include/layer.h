@@ -22,6 +22,9 @@ namespace garlic {
   class LayerValue {
   public:
 
+    using const_array_iterator = typename std::vector<std::shared_ptr<LayerValue>>::const_iterator;
+    using const_member_iterator = typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator;
+
     virtual bool is_string() const { return false; };
     virtual bool is_int() const { return false; };
     virtual bool is_bool() const { return false; };
@@ -43,8 +46,8 @@ namespace garlic {
     virtual const std::shared_ptr<LayerValue>& get(const std::string& key) const  { throw TypeError(); }
     inline const std::shared_ptr<LayerValue>& operator[](const std::string& key) const { return this->get(key); }
 
-    virtual typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator begin_member() const { throw TypeError(); }
-    virtual typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator end_member() const { throw TypeError(); }
+    virtual const_member_iterator begin_member() const { throw TypeError(); }
+    virtual const_member_iterator end_member() const { throw TypeError(); }
 
     virtual const std::shared_ptr<LayerValue>& resolve(const std::string& path) const { throw TypeError(); }
 
@@ -58,8 +61,11 @@ namespace garlic {
 
     virtual const std::shared_ptr<LayerValue>& operator[](uint index) const { throw TypeError(); }
 
-    virtual typename std::vector<std::shared_ptr<LayerValue>>::const_iterator begin_elements() const { throw TypeError(); }
-    virtual typename std::vector<std::shared_ptr<LayerValue>>::const_iterator end_elements() const { throw TypeError(); }
+    virtual const_array_iterator begin_element() const { throw TypeError(); }
+    virtual const_array_iterator end_element() const { throw TypeError(); }
+
+    // utility
+
   };
 
   static std::shared_ptr<LayerValue> NotFoundPtr = nullptr;  // Just so that we have a reference to a NULL pointer.
@@ -136,11 +142,11 @@ namespace garlic {
       this->set(key, std::make_shared<IntegerValue>(value));
     }
 
-    typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator begin_member() const override {
+    const_member_iterator begin_member() const override {
       return this->property_list.begin();
     };
 
-    typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator end_member() const override {
+    const_member_iterator end_member() const override {
       return this->property_list.end();
     };
 
@@ -177,8 +183,8 @@ namespace garlic {
 
     virtual const std::shared_ptr<LayerValue>& operator[](uint index) const override { return this->elements[index]; }
 
-    typename std::vector<std::shared_ptr<LayerValue>>::const_iterator begin_elements() const override { return this->elements.begin(); }
-    typename std::vector<std::shared_ptr<LayerValue>>::const_iterator end_elements() const override { return this->elements.end(); }
+    const_array_iterator begin_element() const override { return this->elements.begin(); }
+    const_array_iterator end_element() const override { return this->elements.end(); }
 
   private:
     std::vector<std::shared_ptr<LayerValue>> elements;
