@@ -17,8 +17,6 @@
 
 namespace garlic {
 
-  // TODO: Correct the plurality of the iterators.
-  // TODO: get_array() and get_list() should return range structures.
   class LayerValue {
   public:
 
@@ -133,7 +131,7 @@ namespace garlic {
     double value;
   };
 
-  class ObjectValue : public LayerValue {  // TODO: Use typedef for the iterator type.
+  class ObjectValue : public LayerValue {
   public:
     inline bool is_object() const override { return true; }
 
