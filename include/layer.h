@@ -23,6 +23,8 @@ namespace garlic {
     using const_array_iterator = typename std::vector<std::shared_ptr<LayerValue>>::const_iterator;
     using const_member_iterator = typename std::map<std::string, std::shared_ptr<LayerValue>>::const_iterator;
 
+    virtual std::shared_ptr<LayerValue> clone() const = 0;
+
     virtual bool is_string() const { return false; };
     virtual bool is_int() const { return false; };
     virtual bool is_bool() const { return false; };
@@ -48,8 +50,7 @@ namespace garlic {
     virtual const_member_iterator end_member() const { throw TypeError(); }
 
     virtual const std::shared_ptr<LayerValue>& resolve(const std::string& path) const { throw TypeError(); }
-
-//    virtual void apply(const std::shared_ptr<LayerValue>&)
+    virtual void apply(const std::shared_ptr<LayerValue>& layer) { throw TypeError(); }
 
     // array-specific methods.
     virtual void add(const std::shared_ptr<LayerValue>& value) { throw TypeError(); }
@@ -59,7 +60,7 @@ namespace garlic {
 
     virtual void remove(uint index) { throw TypeError(); }
 
-    virtual const std::shared_ptr<LayerValue>& operator[](uint index) const { throw TypeError(); }
+    virtual std::shared_ptr<LayerValue>& operator[](uint index) { throw TypeError(); }
 
     virtual const_array_iterator begin_element() const { throw TypeError(); }
     virtual const_array_iterator end_element() const { throw TypeError(); }
@@ -93,6 +94,10 @@ namespace garlic {
   public:
     explicit StringValue(std::string value) : value(std::move(value)) {}
 
+    std::shared_ptr<LayerValue> clone() const override {
+      return std::make_shared<StringValue>(this->value);
+    }
+
     inline bool is_string() const override { return true; }
     const std::string& get_string() const override { return this->value; }
 
@@ -103,6 +108,10 @@ namespace garlic {
   class IntegerValue : public LayerValue {
   public:
     explicit IntegerValue(int value) : value(value) {}
+
+    std::shared_ptr<LayerValue> clone() const override {
+      return std::make_shared<IntegerValue>(this->value);
+    }
 
     inline bool is_int() const override { return true; }
     const int& get_int() const override { return this->value; }
@@ -115,6 +124,10 @@ namespace garlic {
   public:
     explicit BoolValue(bool value) : value(value) {}
 
+    std::shared_ptr<LayerValue> clone() const override {
+      return std::make_shared<BoolValue>(this->value);
+    }
+
     inline bool is_bool() const override { return true; }
     const bool& get_bool() const override { return this->value; }
 
@@ -126,6 +139,10 @@ namespace garlic {
   public:
     explicit DoubleValue(double value) : value(value) {}
 
+    std::shared_ptr<LayerValue> clone() const override {
+      return std::make_shared<DoubleValue>(this->value);
+    }
+
     inline bool is_double() const override { return true; }
     const double& get_double() const override { return this->value; }
 
@@ -136,6 +153,12 @@ namespace garlic {
   class ObjectValue : public LayerValue {
   public:
     inline bool is_object() const override { return true; }
+
+    std::shared_ptr<LayerValue> clone() const override {
+      auto clone = std::make_shared<ObjectValue>();
+      clone->property_list = this->property_list;
+      return clone;
+    }
 
     const std::shared_ptr<LayerValue>& get(const std::string& key) const override {
       auto finder = this->property_list.find(key);
@@ -185,6 +208,20 @@ namespace garlic {
       return *layer_value;
     }
 
+    void apply(const std::shared_ptr<LayerValue>& layer) override {
+      for(const auto& member : layer->get_object()) {
+        if (auto& existing_value = this->property_list[member.first]) {
+          if (existing_value->is_object()) {
+            // Copy the object and then apply the top layer.
+            existing_value = existing_value->clone();
+            existing_value->apply(member.second);
+            continue;
+          }
+        }
+        this->set(member.first, member.second);
+      }
+    }
+
   private:
     std::map<std::string, std::shared_ptr<LayerValue>> property_list;
   };
@@ -192,9 +229,17 @@ namespace garlic {
   class ListValue : public LayerValue {
   public:
     ListValue() = default;
-    explicit ListValue(size_t size) : elements(size) {}
+    explicit ListValue(size_t size) {
+      elements.reserve(size);
+    }
 
-    bool is_array() const override { return true; };
+    bool is_array() const override { return true; }
+
+    std::shared_ptr<LayerValue> clone() const override {
+      auto clone = std::make_shared<ListValue>();
+      clone->elements = this->elements;
+      return clone;
+    }
 
     void add(const std::shared_ptr<LayerValue>& value) override { this->elements.push_back(value); }
     void add(std::shared_ptr<LayerValue>&& value) override { this->elements.push_back(std::move(value)); }
@@ -203,7 +248,7 @@ namespace garlic {
 
     void remove(uint index) override { this->elements.erase(this->elements.begin() + index); }
 
-    virtual const std::shared_ptr<LayerValue>& operator[](uint index) const override { return this->elements[index]; }
+    virtual std::shared_ptr<LayerValue>& operator[](uint index) override { return this->elements[index]; }
 
     const_array_iterator begin_element() const override { return this->elements.begin(); }
     const_array_iterator end_element() const override { return this->elements.end(); }

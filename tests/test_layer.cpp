@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -14,6 +15,15 @@
 using namespace std;
 
 using namespace garlic;
+
+
+int sum(const shared_ptr<LayerValue>& layer) {
+  auto total = 0;
+  for (const auto& item : layer->get_array()) {
+    total += item->get_int();
+  }
+  return total;
+}
 
 
 TEST(LayerTests, StringValueTests) {
@@ -172,6 +182,13 @@ TEST(LayerTests, ListValueTests) {
   for(const auto& item : list_value.get_array()) {
     ASSERT_EQ(item->get_int(), 25);
   }
+
+  // Using size initializer
+  auto pre_allocated_list_value = make_shared<ListValue>(3);
+  pre_allocated_list_value->add(1);
+  pre_allocated_list_value->add(2);
+  pre_allocated_list_value->add(3);
+  ASSERT_EQ(sum(pre_allocated_list_value), 6);
 }
 
 
@@ -206,5 +223,95 @@ TEST(LayerTests, DoubleValueTests) {
 
 
 TEST(LayerTests, MergeTests) {
+  // Load the layers from the data
+  auto base_layer_str = "{\n"
+                    "  \"name\": \"Base Layer\",\n"
+                    "  \"base_raw_value\": 0,\n"
+                    "  \"common_raw_value\": 0,\n"
+                    "  \"base_object\": {\n"
+                    "    \"base_value\": \"Should Not Be Touched\"\n"
+                    "  },\n"
+                    "  \"should_be_merged_object\": {\n"
+                    "    \"base_raw_value_1\": 0,\n"
+                    "    \"common_raw_value\": \"From Base\"\n"
+                    "  },\n"
+                    "  \"items\": [1, 2, 3]\n"
+                    "}";
+  auto layer1_str = "{\n"
+                "  \"name\": \"Layer 1\",\n"
+                "  \"common_raw_value\": 1,\n"
+                "  \"layer1_object\": {\n"
+                "    \"layer1_value\": \"Should Not Be Touched 1\"\n"
+                "  },\n"
+                "  \"should_be_merged_object\": {\n"
+                "    \"layer1_raw_value_1\": 1,\n"
+                "    \"common_raw_value\": \"From Layer 1\"\n"
+                "  },\n"
+                "  \"items\": [10, 20, 30]\n"
+                "}";
+  auto layer2_str = "{\n"
+                "  \"name\": \"Layer 2\",\n"
+                "  \"common_raw_value\": 2,\n"
+                "  \"layer2_object\": {\n"
+                "    \"layer2_value\": \"Should Not Be Touched 2\"\n"
+                "  },\n"
+                "  \"should_be_merged_object\": {\n"
+                "    \"layer2_raw_value_1\": 2,\n"
+                "    \"common_raw_value\": \"From Layer 2\"\n"
+                "  },\n"
+                "  \"items\": [100, 200, 300]\n"
+                "}";
+  auto decoder = JsonDecoder();
+  auto repo = make_shared<MemoryConfigRepository>();
+  repo->save("base_layer", [&base_layer_str](ostream& output_stream) { output_stream << base_layer_str; });
+  repo->save("layer1", [&layer1_str](ostream& output_stream) { output_stream << layer1_str; });
+  repo->save("layer2", [&layer2_str](ostream& output_stream) { output_stream << layer2_str; });
 
+  auto base_layer = decoder.load(*repo->retrieve("base_layer"));
+  auto layer1 = decoder.load(*repo->retrieve("layer1"));
+  auto layer2 = decoder.load(*repo->retrieve("layer2"));
+  auto expected_items = vector<int>{1, 2, 3};
+  auto expected_total = accumulate(expected_items.begin(), expected_items.end(), 0);
+
+  auto target = base_layer->clone();
+  ASSERT_EQ(target->resolve("name")->get_string(), "Base Layer");
+  ASSERT_EQ(target->resolve("base_raw_value")->get_int(), 0);
+  ASSERT_EQ(target->resolve("common_raw_value")->get_int(), 0);
+  ASSERT_EQ(target->resolve("base_object.base_value")->get_string(), "Should Not Be Touched");
+  ASSERT_EQ(sum(target->resolve("items")), expected_total);
+  ASSERT_EQ(target->resolve("layer1_object.layer1_value"), nullptr);
+  ASSERT_EQ(target->resolve("layer2_object.layer2_value"), nullptr);
+  ASSERT_EQ(target->resolve("should_be_merged_object.base_raw_value_1")->get_int(), 0);
+  ASSERT_EQ(target->resolve("should_be_merged_object.common_raw_value")->get_string(), "From Base");
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer1_raw_value_1"), nullptr);
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer2_raw_value_1"), nullptr);
+
+  target->apply(layer1);
+  ASSERT_EQ(target->resolve("name")->get_string(), "Layer 1");
+  ASSERT_EQ(target->resolve("base_raw_value")->get_int(), 0);
+  ASSERT_EQ(target->resolve("common_raw_value")->get_int(), 1);
+  ASSERT_EQ(target->resolve("base_object.base_value")->get_string(), "Should Not Be Touched");
+  ASSERT_EQ(sum(target->resolve("items")), expected_total * 10);
+  ASSERT_EQ(target->resolve("layer1_object.layer1_value")->get_string(), "Should Not Be Touched 1");
+  ASSERT_EQ(target->resolve("layer2_object.layer2_value"), nullptr);
+  ASSERT_EQ(target->resolve("should_be_merged_object.base_raw_value_1")->get_int(), 0);
+  ASSERT_EQ(target->resolve("should_be_merged_object.common_raw_value")->get_string(), "From Layer 1");
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer1_raw_value_1")->get_int(), 1);
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer2_raw_value_1"), nullptr);
+
+  target->apply(layer2);
+  ASSERT_EQ(target->resolve("name")->get_string(), "Layer 2");
+  ASSERT_EQ(target->resolve("base_raw_value")->get_int(), 0);
+  ASSERT_EQ(target->resolve("common_raw_value")->get_int(), 2);
+  ASSERT_EQ(target->resolve("base_object.base_value")->get_string(), "Should Not Be Touched");
+  ASSERT_EQ(sum(target->resolve("items")), expected_total * 100);
+  ASSERT_EQ(target->resolve("layer1_object.layer1_value")->get_string(), "Should Not Be Touched 1");
+  ASSERT_EQ(target->resolve("layer2_object.layer2_value")->get_string(), "Should Not Be Touched 2");
+  ASSERT_EQ(target->resolve("should_be_merged_object.base_raw_value_1")->get_int(), 0);
+  ASSERT_EQ(target->resolve("should_be_merged_object.common_raw_value")->get_string(), "From Layer 2");
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer1_raw_value_1")->get_int(), 1);
+  ASSERT_EQ(target->resolve("should_be_merged_object.layer2_raw_value_1")->get_int(), 2);
+
+  // To make sure the apply function still uses the pointers to make sure extra objects aren't being created.
+  ASSERT_EQ(target->resolve("base_raw_value").get(), base_layer->resolve("base_raw_value").get());
 }
