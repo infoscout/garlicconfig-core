@@ -122,6 +122,37 @@ TEST(LayerTests, ObjectValueTests) {
 }
 
 
+TEST(LayerTests, ResolveTests) {
+  auto root_value = make_shared<ObjectValue>();
+
+  // Go 5 levels deep.
+  string level_key_name = "level0";
+  root_value->set(level_key_name, make_shared<ObjectValue>());
+  for(auto index = 1; index < 5; index++) {
+    auto new_key_name = "level" + to_string(index);
+    root_value->resolve(level_key_name)->set(new_key_name, make_shared<ObjectValue>());
+    level_key_name += "." + new_key_name;
+  }
+
+  // non existing object should yield null pointer.
+  ASSERT_EQ(root_value->resolve("non_existing_field"), NotFoundPtr);
+  if (auto non_existing_value = root_value->resolve("a.b.c")) {  // if statement should be able to handle this.
+    FAIL() << "a.b.c Doesn't exist so the if statement should not be entered.";
+  }
+
+  if (const auto& existing_value = root_value->resolve("level0.level1")) {
+    existing_value->set("name", "Level 1");  // should be found and the pointer should be making changes on the original object.
+  } else {
+    FAIL() << "'level0.level1' was not found but it should have been.";
+  }
+  if (const auto& existing_value = root_value->resolve("level0.level1.name")) {
+    ASSERT_EQ(existing_value->get_string(), "Level 1");
+  } else {
+    FAIL() << "'level0.level1.name' was not found but it should have been.";
+  }
+}
+
+
 TEST(LayerTests, ListValueTests) {
   auto list_value = ListValue();
   list_value.add(25);
@@ -171,4 +202,9 @@ TEST(LayerTests, DoubleValueTests) {
   ASSERT_FALSE(double_value.is_array());
 
   ASSERT_EQ(double_value.get_double(), 10.12);
+}
+
+
+TEST(LayerTests, MergeTests) {
+
 }
