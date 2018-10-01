@@ -22,8 +22,9 @@ shared_ptr<LayerValue> map_value(const Value& value) {
     }
     return object_value;
   } else if (value.IsArray()) {
-    auto list_value = make_shared<ListValue>();
-    for (const auto& item : value.GetArray()) {
+    auto array = value.GetArray();
+    auto list_value = make_shared<ListValue>(array.Size());
+    for (const auto& item : array) {
       list_value->add(map_value(item));
     }
     return list_value;

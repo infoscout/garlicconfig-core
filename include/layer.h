@@ -191,6 +191,9 @@ namespace garlic {
 
   class ListValue : public LayerValue {
   public:
+    ListValue() = default;
+    explicit ListValue(size_t size) : elements(size) {}
+
     bool is_array() const override { return true; };
 
     void add(const std::shared_ptr<LayerValue>& value) override { this->elements.push_back(value); }
