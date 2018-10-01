@@ -21,6 +21,9 @@ namespace garlic {
     std::string missing_config_name;
   };
 
+
+  class TypeError : public std::exception {};  // This exception is raised when unavailable/invalid type is requested.
+
 }
 
 #endif //GARLICCONFIG_EXCEPTIONS_H

@@ -49,7 +49,7 @@ unique_ptr<istream> FileConfigRepository::retrieve(const string &name) const {
 }
 
 
-unique_ptr<istream> MemoryRepository::retrieve(const string &name) const {
+unique_ptr<istream> MemoryConfigRepository::retrieve(const string &name) const {
   auto record_it = this->storage.find(name);
   if (record_it == this->storage.end()) {
     throw ConfigNotFound(name);
@@ -57,7 +57,7 @@ unique_ptr<istream> MemoryRepository::retrieve(const string &name) const {
   return make_unique<istringstream>(record_it->second);
 }
 
-set<string> MemoryRepository::list_configs() const {
+set<string> MemoryConfigRepository::list_configs() const {
   set<string> keys;
   for(const auto& record : this->storage) {
     keys.insert(record.first);
@@ -65,7 +65,7 @@ set<string> MemoryRepository::list_configs() const {
   return keys;
 }
 
-void MemoryRepository::save(const string &name, function<void(ostream &)> write_func) {
+void MemoryConfigRepository::save(const string &name, function<void(ostream &)> write_func) {
   ostringstream output_stream;
   write_func(output_stream);
   this->storage[name] = output_stream.str();

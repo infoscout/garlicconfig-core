@@ -44,12 +44,7 @@ void run_basic_repository_tests(ConfigRepository& repo) {
   }
 
   // Make sure undefined configs throw the config not found exception.
-  try {
-    repo.retrieve("none_existing_config");
-    FAIL();
-  } catch (const ConfigNotFound& ex) {
-    ASSERT_EQ(ex.config_name(), "none_existing_config");
-  }
+  ASSERT_THROW(repo.retrieve("none_existing_config"), ConfigNotFound);
 }
 
 // File Repository
@@ -74,6 +69,6 @@ TEST_F(FileRepositoryTests, BasicTests) {
 
 // Memory Repository
 TEST(MemoryRepositoryTests, BasicTests) {
-  auto memory_repository = make_unique<MemoryRepository>();
+  auto memory_repository = make_unique<MemoryConfigRepository>();
   run_basic_repository_tests(*memory_repository);
 }

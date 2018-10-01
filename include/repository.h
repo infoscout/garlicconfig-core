@@ -40,7 +40,7 @@ namespace garlic {
   };
 
 
-  class MemoryRepository : public ConfigRepository {
+  class MemoryConfigRepository : public ConfigRepository {
   public:
     std::set<std::string> list_configs() const override;
     void save(const std::string& name, std::function<void (std::ostream&)> write_func) override;
