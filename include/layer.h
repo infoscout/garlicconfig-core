@@ -248,7 +248,7 @@ namespace garlic {
 
     void remove(uint index) override { this->elements.erase(this->elements.begin() + index); }
 
-    virtual std::shared_ptr<LayerValue>& operator[](uint index) override { return this->elements[index]; }
+    std::shared_ptr<LayerValue>& operator[](uint index) override { return this->elements[index]; }
 
     const_array_iterator begin_element() const override { return this->elements.begin(); }
     const_array_iterator end_element() const override { return this->elements.end(); }
