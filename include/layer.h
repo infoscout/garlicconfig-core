@@ -100,7 +100,7 @@ namespace garlic {
 
   class IntegerValue : public LayerValue {
   public:
-    explicit IntegerValue(int value) : value(std::move(value)) {}
+    explicit IntegerValue(int value) : value(value) {}
 
     inline bool is_int() const override { return true; }
     const int& get_int() const override { return this->value; }
@@ -111,7 +111,7 @@ namespace garlic {
 
   class BoolValue : public LayerValue {
   public:
-    explicit BoolValue(bool value) : value(std::move(value)) {}
+    explicit BoolValue(bool value) : value(value) {}
 
     inline bool is_bool() const override { return true; }
     const bool& get_bool() const override { return this->value; }
@@ -122,7 +122,7 @@ namespace garlic {
 
   class DoubleValue : public LayerValue {
   public:
-    explicit DoubleValue(double value) : value(std::move(value)) {}
+    explicit DoubleValue(double value) : value(value) {}
 
     inline bool is_double() const override { return true; }
     const double& get_double() const override { return this->value; }
