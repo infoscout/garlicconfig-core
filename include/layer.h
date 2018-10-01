@@ -64,8 +64,27 @@ namespace garlic {
     virtual const_array_iterator begin_element() const { throw TypeError(); }
     virtual const_array_iterator end_element() const { throw TypeError(); }
 
-    // utility
+  private:
+    // Utility structures for supporting range loops.
+    struct array_range {
+      const LayerValue& value;
+      explicit array_range(const LayerValue& value) : value(value) {}
 
+      inline const_array_iterator begin() const { return value.begin_element(); }
+      inline const_array_iterator end() const { return value.end_element(); }
+    };
+
+    struct member_range {
+      const LayerValue &value;
+      explicit member_range(const LayerValue& value) : value(value) {}
+
+      inline const_member_iterator begin() const { return value.begin_member(); }
+      inline const_member_iterator end() const { return value.end_member(); }
+    };
+
+  public:
+    inline array_range get_array() const { return array_range(*this); }
+    inline member_range get_object() const { return member_range(*this); }
   };
 
   static std::shared_ptr<LayerValue> NotFoundPtr = nullptr;  // Just so that we have a reference to a NULL pointer.

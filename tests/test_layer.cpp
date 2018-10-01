@@ -113,6 +113,12 @@ TEST(LayerTests, ObjectValueTests) {
   ASSERT_EQ(keys[0], "age");
   ASSERT_EQ(keys[1], "name");
   ASSERT_EQ(keys[2], "school_info");
+
+  auto index = 0;
+  for(const auto& item : object_value.get_object()) {
+    ASSERT_EQ(keys[index], item.first);
+    index++;
+  }
 }
 
 
@@ -130,6 +136,10 @@ TEST(LayerTests, ListValueTests) {
 
   for(auto it = list_value.begin_element(); it != list_value.end_element(); ++it) {
     ASSERT_EQ((*it)->get_int(), 25);
+  }
+
+  for(const auto& item : list_value.get_array()) {
+    ASSERT_EQ(item->get_int(), 25);
   }
 }
 
