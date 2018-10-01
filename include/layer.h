@@ -49,6 +49,8 @@ namespace garlic {
 
     virtual const std::shared_ptr<LayerValue>& resolve(const std::string& path) const { throw TypeError(); }
 
+//    virtual void apply(const std::shared_ptr<LayerValue>&)
+
     // array-specific methods.
     virtual void add(const std::shared_ptr<LayerValue>& value) { throw TypeError(); }
     virtual void add(std::shared_ptr<LayerValue>&& value) { throw TypeError(); }
@@ -176,7 +178,7 @@ namespace garlic {
         for (const auto &part : parts) {
           if (const auto &result = root->get(part)) {
             layer_value = &result;
-            root = &*result;
+            root = result.get();
           } else { return NotFoundPtr; }
         }
       } catch (const TypeError& error) { return NotFoundPtr; }
