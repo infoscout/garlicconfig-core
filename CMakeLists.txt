@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Sources.
 set(PUBLIC_HEADERS include/garlicconfig.h include/repository.h include/exceptions.h include/layer.h include/encoding.h include/json.h)
 set(SOURCE_FILES
-        ${PUBLIC_HEADERS} src/repository.cpp src/encoding/json.cpp)
+        ${PUBLIC_HEADERS} src/repository.cpp src/encoding/json.cpp src/layer.cpp)
 
 find_package(Boost 1.68.0 REQUIRED COMPONENTS filesystem)
 

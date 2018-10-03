@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
 #include "exceptions.h"
 
 
@@ -154,19 +152,9 @@ namespace garlic {
   public:
     inline bool is_object() const override { return true; }
 
-    std::shared_ptr<LayerValue> clone() const override {
-      auto clone = std::make_shared<ObjectValue>();
-      clone->property_list = this->property_list;
-      return clone;
-    }
+    std::shared_ptr<LayerValue> clone() const override;
 
-    const std::shared_ptr<LayerValue>& get(const std::string& key) const override {
-      auto finder = this->property_list.find(key);
-      if (finder != this->property_list.end()) {
-        return finder->second;
-      }
-      return NotFoundPtr;
-    }
+    const std::shared_ptr<LayerValue>& get(const std::string& key) const override;
 
     void set(const std::string& key, std::shared_ptr<LayerValue>&& value) override {
       this->property_list[key] = std::move(value);
@@ -192,61 +180,30 @@ namespace garlic {
       return this->property_list.end();
     };
 
-    const std::shared_ptr<LayerValue>& resolve(const std::string& path) const override {
-      std::vector<std::string> parts;
-      boost::split(parts, path, boost::is_any_of("."));
-      const std::shared_ptr<LayerValue>* layer_value = &NotFoundPtr;
-      const LayerValue* root = this;
-      try {
-        for (const auto &part : parts) {
-          if (const auto &result = root->get(part)) {
-            layer_value = &result;
-            root = result.get();
-          } else { return NotFoundPtr; }
-        }
-      } catch (const TypeError& error) { return NotFoundPtr; }
-      return *layer_value;
-    }
+    const std::shared_ptr<LayerValue>& resolve(const std::string& path) const override;
 
-    void apply(const std::shared_ptr<LayerValue>& layer) override {
-      for(const auto& member : layer->get_object()) {
-        if (auto& existing_value = this->property_list[member.first]) {
-          if (existing_value->is_object()) {
-            // Copy the object and then apply the top layer.
-            existing_value = existing_value->clone();
-            existing_value->apply(member.second);
-            continue;
-          }
-        }
-        this->set(member.first, member.second);
-      }
-    }
+    void apply(const std::shared_ptr<LayerValue>& layer) override;
 
   private:
     std::map<std::string, std::shared_ptr<LayerValue>> property_list;
   };
 
+
   class ListValue : public LayerValue {
   public:
     ListValue() = default;
-    explicit ListValue(size_t size) {
-      elements.reserve(size);
-    }
+    explicit ListValue(size_t size);
 
-    bool is_array() const override { return true; }
+    inline bool is_array() const override { return true; }
 
-    std::shared_ptr<LayerValue> clone() const override {
-      auto clone = std::make_shared<ListValue>();
-      clone->elements = this->elements;
-      return clone;
-    }
+    std::shared_ptr<LayerValue> clone() const override;
 
-    void add(const std::shared_ptr<LayerValue>& value) override { this->elements.push_back(value); }
-    void add(std::shared_ptr<LayerValue>&& value) override { this->elements.push_back(std::move(value)); }
-    void add(std::string&& value) override { this->elements.push_back(std::make_shared<StringValue>(std::move(value))); }
-    void add(int&& value) override { this->elements.push_back(std::make_shared<IntegerValue>(value)); }
+    void add(const std::shared_ptr<LayerValue>& value) override;
+    void add(std::shared_ptr<LayerValue>&& value) override;
+    void add(std::string&& value) override;
+    void add(int&& value) override;
 
-    void remove(unsigned int index) override { this->elements.erase(this->elements.begin() + index); }
+    void remove(unsigned int index) override;
 
     std::shared_ptr<LayerValue>& operator[](unsigned int index) override { return this->elements[index]; }
 
