@@ -1,5 +1,5 @@
 # Project Settings
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 project(GarlicConfig VERSION 1.0.0 DESCRIPTION "Library primarily used for reading, writing and merging garlic configs.")
 include(GNUInstallDirs)
 IF(NOT CGET_PREFIX)
