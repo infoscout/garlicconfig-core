@@ -16,7 +16,7 @@ set(SOURCE_FILES
 find_package(Boost 1.68.0 REQUIRED COMPONENTS filesystem)
 
 # Library
-add_library(${PROJECT_NAME} ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} PUBLIC_HEADER "${PUBLIC_HEADERS}")
 target_include_directories(
         ${PROJECT_NAME} INTERFACE
