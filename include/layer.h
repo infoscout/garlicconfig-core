@@ -58,9 +58,9 @@ namespace garlic {
     virtual void add(std::string&& value) { throw TypeError(); }
     virtual void add(int&& value) { throw TypeError(); }
 
-    virtual void remove(uint index) { throw TypeError(); }
+    virtual void remove(unsigned int index) { throw TypeError(); }
 
-    virtual std::shared_ptr<LayerValue>& operator[](uint index) { throw TypeError(); }
+    virtual std::shared_ptr<LayerValue>& operator[](unsigned int index) { throw TypeError(); }
 
     virtual const_array_iterator begin_element() const { throw TypeError(); }
     virtual const_array_iterator end_element() const { throw TypeError(); }
@@ -246,9 +246,9 @@ namespace garlic {
     void add(std::string&& value) override { this->elements.push_back(std::make_shared<StringValue>(std::move(value))); }
     void add(int&& value) override { this->elements.push_back(std::make_shared<IntegerValue>(value)); }
 
-    void remove(uint index) override { this->elements.erase(this->elements.begin() + index); }
+    void remove(unsigned int index) override { this->elements.erase(this->elements.begin() + index); }
 
-    std::shared_ptr<LayerValue>& operator[](uint index) override { return this->elements[index]; }
+    std::shared_ptr<LayerValue>& operator[](unsigned int index) override { return this->elements[index]; }
 
     const_array_iterator begin_element() const override { return this->elements.begin(); }
     const_array_iterator end_element() const override { return this->elements.end(); }
