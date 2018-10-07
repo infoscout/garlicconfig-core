@@ -1,12 +1,23 @@
+# CMake Settings
+cmake_minimum_required(VERSION 2.8.11.2)
+if (POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)  # for sub-projects
+endif ()
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+endif (APPLE)
+
 # Project Settings
-cmake_minimum_required(VERSION 3.10)
-project(GarlicConfig VERSION 1.0.0 DESCRIPTION "Library primarily used for reading, writing and merging garlic configs.")
+project(GarlicConfig VERSION 1.0.0)
+set(PROJECT_VERSION 1.0.0)]
+set(PROJECT_DESCRIPTION "Library primarily used for reading, writing and merging garlic configs.")
 include(GNUInstallDirs)
 IF(NOT CGET_PREFIX)
     include(cget/cget/cget.cmake)  # Include cget's cmake file to load up all dependencies.
 ENDIF()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 # Sources.
 set(PUBLIC_HEADERS include/garlicconfig.h include/repository.h include/exceptions.h include/layer.h include/encoding.h include/json.h)

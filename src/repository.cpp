@@ -43,7 +43,7 @@ unique_ptr<istream> FileConfigRepository::retrieve(const string &name) const {
   if (not fs::exists(file_path)) {
     throw ConfigNotFound(name);
   }
-  auto input_stream = make_unique<ifstream>();
+  auto input_stream = unique_ptr<ifstream>(new ifstream);
   input_stream->open(file_path.string(), fstream::in | fstream::binary);
   return input_stream;
 }
@@ -54,7 +54,7 @@ unique_ptr<istream> MemoryConfigRepository::retrieve(const string &name) const {
   if (record_it == this->storage.end()) {
     throw ConfigNotFound(name);
   }
-  return make_unique<istringstream>(record_it->second);
+  return unique_ptr<istringstream>(new istringstream(record_it->second));
 }
 
 set<string> MemoryConfigRepository::list_configs() const {

@@ -62,13 +62,13 @@ public:
 };
 
 TEST_F(FileRepositoryTests, BasicTests) {
-  auto file_repository = make_unique<FileConfigRepository>(this->test_directory.string());
+  auto file_repository = unique_ptr<FileConfigRepository>(new FileConfigRepository(this->test_directory.string()));
   run_basic_repository_tests(*file_repository);
 }
 
 
 // Memory Repository
 TEST(MemoryRepositoryTests, BasicTests) {
-  auto memory_repository = make_unique<MemoryConfigRepository>();
+  auto memory_repository = unique_ptr<MemoryConfigRepository>(new MemoryConfigRepository());
   run_basic_repository_tests(*memory_repository);
 }
