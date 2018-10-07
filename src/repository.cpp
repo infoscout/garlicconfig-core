@@ -43,9 +43,9 @@ unique_ptr<istream> FileConfigRepository::retrieve(const string &name) const {
   if (not fs::exists(file_path)) {
     throw ConfigNotFound(name);
   }
-  auto input_stream = unique_ptr<ifstream>(new ifstream);
+  auto input_stream = unique_ptr<ifstream>(new ifstream());
   input_stream->open(file_path.string(), fstream::in | fstream::binary);
-  return input_stream;
+  return std::move(input_stream);
 }
 
 
