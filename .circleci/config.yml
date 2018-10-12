@@ -9,6 +9,10 @@ jobs:
             - run:
                 name: Install Dependencies
                 command: ./init.sh
+            - save_cache:
+                key: cget-cache
+                paths:
+                    - cget
             - run:
                 name: Run Tests
                 command: mkdir release && cd release && cmake .. && make && cd tests && ./GarlicConfigTest
