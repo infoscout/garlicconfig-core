@@ -1,0 +1,20 @@
+version: 2
+
+jobs:
+    test-linux:
+        docker:
+            - image: peymanmo/many_x64
+        steps:
+            - checkout
+            - run:
+                name: Install Dependencies
+                command: ./init.sh
+            - run:
+                name: Run Tests
+                command: mkdir release && cd release && cmake .. && make && cd tests && ./GarlicConfigTest
+
+workflows:
+    version: 2
+    pr-checks:
+        jobs:
+            - test-linux
