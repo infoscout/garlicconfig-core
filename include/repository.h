@@ -5,6 +5,7 @@
 #ifndef GARLICCONFIG_REPOSITORY_H
 #define GARLICCONFIG_REPOSITORY_H
 
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
