@@ -14,7 +14,7 @@ aliases:
   - "cget"
 - &build_from_source
   name: Build from source
-  command: mkdir release && cd release && cmake .. && make
+  command: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
 - &run_tests
   name: Run Tests
   command: ./release/tests/GarlicConfigTest
@@ -47,7 +47,7 @@ jobs:
         command: "brew install gcc"
     - checkout
     - run:
-        name: "Choose GNU C++"
+        name: "Setup Environment Variables"
         command: |
           echo 'export CXX=/usr/local/Cellar/gcc/8.2.0/bin/g++-8' >> $BASH_ENV
           echo 'export CC=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8' >> $BASH_ENV
