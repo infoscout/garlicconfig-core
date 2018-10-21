@@ -1,40 +1,65 @@
 version: 2
 
 aliases:
-    - &restore_cache
-        keys:
-            - cget-{{ arch }}-{{ checksum "requirements.txt" }}
-    - &install_dependencies
-        name: Install Dependencies
-        command: ./init.sh
-    - &save_cache
-        key:
-            cget-{{ arch }}-{{ checksum "requirements.txt" }}
-        paths:
-            - "cget"
-    - &build_from_source
-        name: Build from source
-        command: mkdir release && cd release && cmake .. && make
-    - &run_tests
-        name: Run Tests
-        command: ./release/tests/GarlicConfigTest
+- &restore_cache
+  keys:
+  - cget-{{ arch }}-{{ checksum "requirements.txt" }}
+- &install_dependencies
+  name: Install Dependencies
+  command: ./init.sh
+- &save_cache
+  key:
+    cget-{{ arch }}-{{ checksum "requirements.txt" }}
+  paths:
+  - "cget"
+- &build_from_source
+  name: Build from source
+  command: mkdir release && cd release && cmake .. && make
+- &run_tests
+  name: Run Tests
+  command: ./release/tests/GarlicConfigTest
 
 
 jobs:
-    test-linux:
-        docker:
-            - image: peymanmo/many_x64
-        steps:
-            - checkout
-            - restore_cache: *restore_cache
-            - run: *install_dependencies
-            - save_cache: *save_cache
-            - run: *build_from_source
-            - run: *run_tests
+  test-linux:
+    docker:
+    - image: peymanmo/many_x64
+    steps:
+    - checkout
+    - restore_cache: *restore_cache
+    - run: *install_dependencies
+    - save_cache: *save_cache
+    - run: *build_from_source
+    - run: *run_tests
 
+  test-mac:
+    macos:
+      xcode: "10.0.0"
+    steps:
+    - run:
+        name: "Install Homebrew"
+        command: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    - run:
+        name: "Install Development Tools"
+        command: "pip install cmake cget"
+    - run:
+        name: "Install GCC"
+        command: "brew install gcc"
+    - checkout
+    - run:
+        name: "Choose GNU C++"
+        command: |
+          echo 'export CXX=/usr/local/Cellar/gcc/8.2.0/bin/g++-8' >> $BASH_ENV
+          echo 'export CC=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8' >> $BASH_ENV
+    - restore_cache: *restore_cache
+    - run: *install_dependencies
+    - save_cache: *save_cache
+    - run: *build_from_source
+    - run: *run_tests
 
 workflows:
-    version: 2
-    pr-checks:
-        jobs:
-            - test-linux
+  version: 2
+  pr-checks:
+    jobs:
+    - test-linux
+    - test-mac
