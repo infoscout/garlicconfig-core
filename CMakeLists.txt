@@ -10,6 +10,9 @@ ENDIF()
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Options
+option(BUILD_SHARED_LIB "Build the shared library" OFF)
+
 # Sources.
 set(PUBLIC_HEADERS include/garlicconfig.h include/repository.h include/exceptions.h include/layer.h include/encoding.h include/json.h)
 set(SOURCE_FILES
@@ -18,7 +21,12 @@ set(SOURCE_FILES
 find_package(Boost 1.68.0 REQUIRED COMPONENTS filesystem)
 
 # Library
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+IF(BUILD_SHARED_LIB)
+    add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+ELSE()
+    add_library(${PROJECT_NAME} ${SOURCE_FILES})
+ENDIF()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} PUBLIC_HEADER "${PUBLIC_HEADERS}")
 target_include_directories(
         ${PROJECT_NAME} INTERFACE
