@@ -2,7 +2,7 @@
 // Created by Peyman Mortazavi on 9/21/18.
 //
 
-#include <boost/algorithm/string.hpp>
+#include <memory>
 
 #include "layer.h"
 
@@ -10,6 +10,45 @@
 using namespace std;
 
 using namespace garlic;
+
+
+struct string_partitioner {
+  explicit string_partitioner(const string& text, char separator='.') : _text(text), _separator(separator) {}
+  bool next(std::string& word) {
+    for(auto index = _start; index < _text.length(); index++) {
+      if (_text[index] == _separator) {
+        if (_count) {
+          word = _text.substr(_start, _count);
+          _start = index;
+          _count = 0;
+          return true;
+        } else {
+          _start = index + 1;
+        }
+      } else {
+        _count++;
+      }
+    }
+    if (_count) {
+      word = _text.substr(_start);  // update the word one last time if there has been any string left.
+      _start = _text.length();  // this'll make the next run not enter the loop.
+      _count = 0;  // this'll make the next run not come here again.
+      return true;
+    }
+    return false;
+  }
+  template<typename T> static void for_each(const std::string& text, T func, char separator='.') {
+    string_partitioner it{text, separator};
+    std::string route;
+    while (it.next(route)) func(route);
+  }
+
+private:
+  const std::string& _text;
+  char _separator;
+  unsigned long _start = 0;
+  unsigned long _count = 0;
+};
 
 
 // ObjectValue
@@ -29,7 +68,7 @@ const shared_ptr<LayerValue>& ObjectValue::get(const string &key) const {
 
 const shared_ptr<LayerValue>& ObjectValue::resolve(const string &path) const {
   vector<string> parts;
-  boost::split(parts, path, boost::is_any_of("."));
+  string_partitioner::for_each(path, [&parts](string item) {parts.emplace_back(move(item));});
   const shared_ptr<LayerValue>* layer_value = &NotFoundPtr;
   const LayerValue* root = this;
   try {

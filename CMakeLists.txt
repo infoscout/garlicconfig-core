@@ -18,8 +18,6 @@ set(PUBLIC_HEADERS include/garlicconfig.h include/repository.h include/exception
 set(SOURCE_FILES
         ${PUBLIC_HEADERS} src/repository.cpp src/encoding/json.cpp src/layer.cpp)
 
-find_package(Boost 1.68.0 REQUIRED COMPONENTS filesystem)
-
 # Library
 IF(BUILD_SHARED_LIB)
     add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -31,11 +29,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} PUBL
 target_include_directories(
         ${PROJECT_NAME} INTERFACE
         "$<BUILD_INTERFACE:${GarlicConfig_SOURCE_DIR}/include>"
-        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>")
-include_directories(${PROJECT_NAME} src)
-include_directories(${PROJECT_NAME} include)
-include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>"
+        PRIVATE "src" "include")
+include_directories(${PROJECT_NAME} lib)
 
 
 # Installation

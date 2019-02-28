@@ -49,8 +49,8 @@ jobs:
     - run:
         name: "Setup Environment Variables"
         command: |
-          echo 'export CXX=/usr/local/Cellar/gcc/8.2.0/bin/g++-8' >> $BASH_ENV
-          echo 'export CC=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8' >> $BASH_ENV
+          echo 'export CXX=/usr/local/Cellar/gcc/8.3.0/bin/g++-8' >> $BASH_ENV
+          echo 'export CC=/usr/local/Cellar/gcc/8.3.0/bin/gcc-8' >> $BASH_ENV
           echo 'export DYLD_LIBRARY_PATH=$(pwd)/cget/lib' >> $BASH_ENV
     - restore_cache: *restore_cache
     - run: *install_dependencies

@@ -1,3 +1,2 @@
-  google/googletest@release-1.8.1 --test
-  Tencent/rapidjson@v1.1.0 -DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_EXAMPLES=OFF -DRAPIDJSON_BUILD_TESTS=OFF
-  boost,http://downloads.sourceforge.net/project/boost/boost/1.68.0/boost_1_68_0.tar.bz2 --cmake boost -DBOOST_WITH_FILESYSTEM=1
+google/googletest@release-1.8.1 --test
+Tencent/rapidjson@v1.1.0 -DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_EXAMPLES=OFF -DRAPIDJSON_BUILD_TESTS=OFF

@@ -2,14 +2,13 @@
 // Created by Peyman Mortazavi on 9/21/18.
 //
 
-#include <gtest/gtest.h>
+#include <cstdlib>
 
-#include <boost/filesystem.hpp>
+#include <gtest/gtest.h>
 
 #include "garlicconfig.h"
 
 
-using namespace boost::filesystem;
 using namespace garlic;
 using namespace std;
 using namespace ::testing;
@@ -50,19 +49,21 @@ void run_basic_repository_tests(ConfigRepository& repo) {
 // File Repository
 class FileRepositoryTests : public Test {
 public:
-  path test_directory{"testdata"};
+  string test_directory{"testdata"};
 
   void SetUp() override {
-    create_directory(this->test_directory);
+    string cmd = "mkdir " + test_directory;
+    std::system(cmd.c_str());
   }
 
   void TearDown() override {
-    remove_all(this->test_directory);
+    string cmd = "rm -fr " + test_directory;
+    std::system(cmd.c_str());
   }
 };
 
 TEST_F(FileRepositoryTests, BasicTests) {
-  auto file_repository = unique_ptr<FileConfigRepository>(new FileConfigRepository(this->test_directory.string()));
+  auto file_repository = unique_ptr<FileConfigRepository>(new FileConfigRepository(this->test_directory));
   run_basic_repository_tests(*file_repository);
 }
 

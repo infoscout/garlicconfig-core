@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <boost/filesystem.hpp>
+#include <tinydir/tinydir.h>
 
 #include "exceptions.h"
 #include "repository.h"
@@ -15,36 +15,49 @@ using namespace std;
 
 using namespace garlic;
 
-namespace fs = boost::filesystem;
 
+string path_append(const string& original, const string& name) {
+  if (original[original.size()-1] == '/' && name[name.size()-1] == '/') {
+    return original + name.substr(1);
+  } else if (original[original.size()-1] != '/' && name[name.size()-1] != '/') {
+    return original + "/" + name;
+  } else {
+    return original + name;
+  }
+}
 
 set<string> FileConfigRepository::list_configs() const {
+  tinydir_dir dir;
+  tinydir_open(&dir, this->root_path.c_str());
   set<string> all_configs;
-  auto end = fs::directory_iterator{};
-  for (auto it = fs::directory_iterator{this->root_path}; it != end; it++) {
-    if (not is_regular_file(it->status()) or it->path().extension() != ".garlic") {
-      continue;
+  while (dir.has_next) {
+    tinydir_file file;
+    tinydir_readfile(&dir, &file);
+    if (file.is_reg && strcmp(file.extension, "garlic") == 0) {
+      string tmp(file.name);
+      all_configs.emplace(tmp.substr(0, tmp.find_last_of('.')));
     }
-    all_configs.insert(it->path().stem().string());
+    tinydir_next(&dir);
   }
+  tinydir_close(&dir);
   return all_configs;
 }
 
 void FileConfigRepository::save(const string& name, function<void(ostream &)> write_func) {
-  auto file_path = fs::path{this->root_path} / name;
+  auto file_path = path_append(this->root_path,  name + ".garlic");
   ofstream output_stream;
-  output_stream.open(file_path.string() + ".garlic", fstream::out | fstream::binary);
+  output_stream.open(file_path, fstream::out | fstream::binary);
   write_func(output_stream);
   // Note that there is no need to close the output_stream here because it'll go out of scope and get closed on its own.
 }
 
 unique_ptr<istream> FileConfigRepository::retrieve(const string &name) const {
-  auto file_path = fs::path{this->root_path} / (name + ".garlic");
-  if (not fs::exists(file_path)) {
+  auto file_path = path_append(this->root_path,  name + ".garlic");
+  auto input_stream = unique_ptr<ifstream>(new ifstream());
+  input_stream->open(file_path, fstream::in | fstream::binary);
+  if (not input_stream->good()) {
     throw ConfigNotFound(name);
   }
-  auto input_stream = unique_ptr<ifstream>(new ifstream());
-  input_stream->open(file_path.string(), fstream::in | fstream::binary);
   return std::move(input_stream);
 }
 
