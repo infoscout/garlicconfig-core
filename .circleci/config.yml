@@ -21,9 +21,9 @@ aliases:
 
 
 jobs:
-  test-linux:
+  test-alpine-linux:
     docker:
-    - image: peymanmo/many_x64
+    - image: peymanmo/garlicconfig-alpine
     steps:
     - checkout
     - restore_cache:
@@ -38,9 +38,9 @@ jobs:
     - run: *build_from_source
     - run: *run_tests
 
-  test-alpine-linux:
+  test-linux:
     docker:
-    - image: peymanmo/garlicconfig-alpine
+    - image: peymanmo/many_x64
     steps:
     - checkout
     - restore_cache: *restore_cache
