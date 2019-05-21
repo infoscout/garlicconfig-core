@@ -74,5 +74,5 @@ workflows:
   pr-checks:
     jobs:
     - test-linux
-		- test-alpine-linux
+    - test-alpine-linux
     - test-mac
