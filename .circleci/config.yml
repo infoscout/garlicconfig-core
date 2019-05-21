@@ -6,7 +6,7 @@ aliases:
   - cget-{{ arch }}-{{ checksum "requirements.txt" }}
 - &install_dependencies
   name: Install Dependencies
-  command: ./init.sh
+  command: sh init.sh
 - &save_cache
   key:
     cget-{{ arch }}-{{ checksum "requirements.txt" }}
