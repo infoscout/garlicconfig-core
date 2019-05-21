@@ -26,9 +26,15 @@ jobs:
     - image: peymanmo/many_x64
     steps:
     - checkout
-    - restore_cache: *restore_cache
+    - restore_cache:
+        keys:
+            - cget-alpine-{{ checksum "requirements.txt" }}
     - run: *install_dependencies
-    - save_cache: *save_cache
+    - save_cache:
+        key:
+            cget-alpine-{{ checksum "requirements.txt" }}
+        paths:
+        - "cget"
     - run: *build_from_source
     - run: *run_tests
 
