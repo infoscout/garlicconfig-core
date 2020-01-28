@@ -37,16 +37,7 @@ jobs:
     - run:
         name: "Install Development Tools"
         command: "pip install cmake cget"
-    - run:
-        name: "Install GCC"
-        command: "brew install gcc"
     - checkout
-    - run:
-        name: "Setup Environment Variables"
-        command: |
-          echo 'export CXX=/usr/local/Cellar/gcc/9.2.0/bin/g++-9' >> $BASH_ENV
-          echo 'export CC=/usr/local/Cellar/gcc/9.2.0/bin/gcc-9' >> $BASH_ENV
-          echo 'export DYLD_LIBRARY_PATH=$(pwd)/cget/lib' >> $BASH_ENV
     - restore_cache: *restore_cache
     - run: *install_dependencies
     - save_cache: *save_cache
@@ -91,7 +82,16 @@ jobs:
     - run:
         name: "Install Development Tools"
         command: "pip install cmake cget"
+    - run:
+        name: "Install GCC"
+        command: "brew install gcc"
     - checkout
+    - run:
+        name: "Setup Environment Variables"
+        command: |
+          echo 'export CXX=/usr/local/Cellar/gcc/9.2.0/bin/g++-9' >> $BASH_ENV
+          echo 'export CC=/usr/local/Cellar/gcc/9.2.0/bin/gcc-9' >> $BASH_ENV
+          echo 'export DYLD_LIBRARY_PATH=$(pwd)/cget/lib' >> $BASH_ENV
     - restore_cache: *restore_cache
     - run: *install_dependencies
     - save_cache: *save_cache
