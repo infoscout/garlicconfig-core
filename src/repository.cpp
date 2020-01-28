@@ -55,7 +55,7 @@ unique_ptr<istream> FileConfigRepository::retrieve(const string &name) const {
   auto file_path = path_append(this->root_path,  name + ".garlic");
   auto input_stream = unique_ptr<ifstream>(new ifstream());
   input_stream->open(file_path, fstream::in | fstream::binary);
-  if (not input_stream->good()) {
+  if (!input_stream->good()) {
     throw ConfigNotFound(name);
   }
   return std::move(input_stream);

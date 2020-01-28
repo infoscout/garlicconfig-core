@@ -39,8 +39,13 @@ jobs:
     - restore_cache: *restore_cache
     - run: *install_dependencies
     - save_cache: *save_cache
-    - run: *build_from_source
-    - run: *run_tests
+    - run:
+        name: "Build From Source (Win32)"
+        command: |
+          mkdir release
+          cd release
+          cmake .. -DBUILD_SHARED_LIB=ON
+          msbuild GarlicConfig.sln
 
   test-alpine-linux:
     docker:
