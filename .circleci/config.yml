@@ -46,11 +46,6 @@ jobs:
           cd release
           cmake .. -DBUILD_SHARED_LIB=ON
           msbuild GarlicConfig.sln /t:Build /p:Configuration=Release
-    - run:
-        name: "Run Tests (Win32)"
-        command: |
-          cd release/tests/Release
-          .\GarlicConfigTest.exe
 
   test-alpine-linux:
     docker:
