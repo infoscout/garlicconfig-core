@@ -1,15 +1,18 @@
-version: 2
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.2.0
 
 aliases:
 - &restore_cache
   keys:
-  - cget-{{ arch }}-{{ checksum "requirements.txt" }}
+  - cget-v1-{{ arch }}-{{ checksum "requirements.txt" }}
 - &install_dependencies
   name: Install Dependencies
   command: sh init.sh
 - &save_cache
   key:
-    cget-{{ arch }}-{{ checksum "requirements.txt" }}
+    cget-v1-{{ arch }}-{{ checksum "requirements.txt" }}
   paths:
   - "cget"
 - &build_from_source
@@ -21,6 +24,29 @@ aliases:
 
 
 jobs:
+  test-win32:
+    executor: win/default
+    steps:
+    - checkout
+    - run:
+        name: "Install Python and Create Virtual Env"
+        command: |
+          nuget install python -Version 3.8.1 -ExcludeVersion -OutputDirectory .
+          .\python\tools\python.exe --version
+    - run:
+        name: "Install Development Tools"
+        command: "pip install cmake cget"
+    - restore_cache: *restore_cache
+    - run: *install_dependencies
+    - save_cache: *save_cache
+    - run:
+        name: "Build From Source (Win32)"
+        command: |
+          mkdir release
+          cd release
+          cmake .. -DBUILD_SHARED_LIB=ON
+          msbuild GarlicConfig.sln /t:Build /p:Configuration=Release
+
   test-alpine-linux:
     docker:
     - image: peymanmo/garlicconfig-alpine
@@ -66,8 +92,8 @@ jobs:
     - run:
         name: "Setup Environment Variables"
         command: |
-          echo 'export CXX=/usr/local/Cellar/gcc/9.1.0/bin/g++-9' >> $BASH_ENV
-          echo 'export CC=/usr/local/Cellar/gcc/9.1.0/bin/gcc-9' >> $BASH_ENV
+          echo 'export CXX=/usr/local/Cellar/gcc/9.2.0_3/bin/g++-9' >> $BASH_ENV
+          echo 'export CC=/usr/local/Cellar/gcc/9.2.0_3/bin/gcc-9' >> $BASH_ENV
           echo 'export DYLD_LIBRARY_PATH=$(pwd)/cget/lib' >> $BASH_ENV
     - restore_cache: *restore_cache
     - run: *install_dependencies
@@ -82,3 +108,4 @@ workflows:
     - test-linux
     - test-alpine-linux
     - test-mac
+    - test-win32
