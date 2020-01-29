@@ -43,7 +43,7 @@ jobs:
     - run:
         name: "Retrieve MinGW Compiler"
         command: |
-          .\circleci\install_mingw.ps1
+          .circleci\install_mingw.ps1
     - save_cache:
         key: mingw
         paths:
