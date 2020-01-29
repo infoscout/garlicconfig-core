@@ -49,7 +49,7 @@ jobs:
     - run:
         name: "Get Dependencies and Build From Source (Win32)"
         command: |
-          $Env:path = "C:\mingw\bin;C:\Users\circleci\project\garlic\Scrips\;"
+          $Env:path = "C:\mingw\bin;C:\Users\circleci\project\garlic\Scripts\;"
           cget init --std=gnu++0x --static
           cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
           mkdir release
