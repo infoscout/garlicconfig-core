@@ -29,23 +29,36 @@ jobs:
     steps:
     - checkout
     - run:
-        name: "Install Python and Create Virtual Env"
+        name: "Install Python, Create Virtual Env and Install Dependencies"
         command: |
+          cd ~
           nuget install python -Version 3.8.1 -ExcludeVersion -OutputDirectory .
-          .\python\tools\python.exe --version
+          .\python\tools\python.exe -m pip install virtualenv
+          .\python\tools\python.exe -m virtualenv garlic
+          .\garlic\Scripts\activate.ps1
+          pip install cmake cget
     - run:
-        name: "Install Development Tools"
-        command: "pip install cmake cget"
-    - restore_cache: *restore_cache
-    - run: *install_dependencies
-    - save_cache: *save_cache
-    - run:
-        name: "Build From Source (Win32)"
+        name: "Retrieve MinGW Compiler"
         command: |
+          $client = New-Object System.Net.WebClient
+          $client.DownloadFile("https://osdn.net/frs/redir.php?m=constant&f=mingw%2F68260%2Fmingw-get-0.6.3-mingw32-pre-20170905-1-bin.zip", "C:\mingw.zip")
+          mkdir C:\mingw
+          unzip C:\mingw.zip -d C:\mingw
+          cd C:\mingw\bin\
+          .\mingw-get.exe install gcc g++ mingw32-make
+    - run:
+        name: "Get Dependencies and Build From Source (Win32)"
+        command: |
+          $Env:path = "C:\mingw\bin;C:\Users\circleci\project\garlic\Scrips\;"
+          cget init --std=gnu++0x --static
+          cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
           mkdir release
           cd release
-          cmake .. -DBUILD_SHARED_LIB=ON
-          msbuild GarlicConfig.sln /t:Build /p:Configuration=Release
+          cmake .. -G "MinGW Makefiles"
+          mingw32-make
+    - run:
+        name: "Run Tests"
+        command: .\release\tests\GarlicConfigTest.exe
 
   test-alpine-linux:
     docker:
