@@ -37,25 +37,29 @@ jobs:
           .\python\tools\python.exe -m virtualenv garlic
           .\garlic\Scripts\activate.ps1
           pip install cmake cget
+    - restore_cache:
+        keys:
+        - mingw
     - run:
         name: "Retrieve MinGW Compiler"
         command: |
-          $client = New-Object System.Net.WebClient
-          $client.DownloadFile("https://osdn.net/frs/redir.php?m=constant&f=mingw%2F68260%2Fmingw-get-0.6.3-mingw32-pre-20170905-1-bin.zip", "C:\mingw.zip")
-          mkdir C:\mingw
-          unzip C:\mingw.zip -d C:\mingw
-          cd C:\mingw\bin\
-          .\mingw-get.exe install gcc g++ mingw32-make
+          .\circleci\install_mingw.ps1
+    - save_cache:
+        key: mingw
+        paths:
+        - "C:\\mingw"
+    - restore_cache: *restore_cache
     - run:
         name: "Get Dependencies and Build From Source (Win32)"
         command: |
-          $Env:path = "C:\mingw\bin;C:\Users\circleci\project\garlic\Scripts\;"
+          $Env:path = "C:\mingw\bin;C:\Users\circleci\garlic\Scripts\;"
           cget init --std=gnu++0x --static
           cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
           mkdir release
           cd release
           cmake .. -G "MinGW Makefiles"
           mingw32-make
+    - save_cache: *save_cache
     - run:
         name: "Run Tests"
         command: .\release\tests\GarlicConfigTest.exe
