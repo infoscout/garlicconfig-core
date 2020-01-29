@@ -62,7 +62,9 @@ jobs:
     - save_cache: *save_cache
     - run:
         name: "Run Tests"
-        command: .\release\tests\GarlicConfigTest.exe
+        command: |
+          $Env:path = "C:\mingw\bin;"
+          .\release\tests\GarlicConfigTest.exe
 
   test-alpine-linux:
     docker:
