@@ -6,13 +6,13 @@ orbs:
 aliases:
 - &restore_cache
   keys:
-  - cget-v1-{{ arch }}-{{ checksum "requirements.txt" }}
+  - cget-v2-{{ arch }}-{{ checksum "requirements.txt" }}
 - &install_dependencies
   name: Install Dependencies
   command: sh init.sh
 - &save_cache
   key:
-    cget-v1-{{ arch }}-{{ checksum "requirements.txt" }}
+    cget-v2-{{ arch }}-{{ checksum "requirements.txt" }}
   paths:
   - "cget"
 - &build_from_source
