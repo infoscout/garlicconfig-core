@@ -29,6 +29,7 @@ namespace garlic {
     virtual bool is_double() const { return false; };
     virtual bool is_array() const { return false; };
     virtual bool is_object() const { return false; };
+    virtual bool is_null() const { return false; }
 
     virtual const std::string& get_string() const { throw TypeError(); }
     virtual const int& get_int() const { throw TypeError(); }
@@ -87,6 +88,15 @@ namespace garlic {
   };
 
   static std::shared_ptr<LayerValue> NotFoundPtr = nullptr;  // Just so that we have a reference to a NULL pointer.
+
+  class NullValue : public LayerValue {
+  public:
+    std::shared_ptr<LayerValue> clone() const override {
+      return std::make_shared<NullValue>();
+    }
+
+    inline bool is_null() const override { return true; }
+  };
 
   class StringValue : public LayerValue {
   public:
