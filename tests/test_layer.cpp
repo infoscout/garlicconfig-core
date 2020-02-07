@@ -26,6 +26,14 @@ int sum(const shared_ptr<LayerValue>& layer) {
 }
 
 
+TEST(LayerTests, NullValueTests) {
+  auto value = NullValue();
+  auto ptr = value.clone();
+  ASSERT_TRUE(value.is_null());
+  ASSERT_TRUE(ptr->is_null());
+}
+
+
 TEST(LayerTests, StringValueTests) {
   auto some_string_value = "Some String Value";
   auto string_value = StringValue(some_string_value);  // lvalue support.
