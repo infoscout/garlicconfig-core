@@ -36,6 +36,8 @@ shared_ptr<LayerValue> map_value(const Value& value) {
     return make_shared<DoubleValue>(value.GetDouble());
   } else if (value.IsBool()) {
     return make_shared<BoolValue>(value.GetBool());
+  } else if (value.IsNull()) {
+    return make_shared<NullValue>();
   } else {
     throw TypeError();
   }
