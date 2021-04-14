@@ -1,0 +1,9 @@
+version: "3.0"
+
+services:
+    compiler:
+        build:
+            dockerfile: docker/Dockerfile
+            context: .
+        volumes:
+            - ./:/project
