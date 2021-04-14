@@ -23,3 +23,18 @@ You just have to make sure cget is initialized to use C++11 and set your preferr
 
 ## Development
 You need to make sure you have cGet, CMake 3.11 and a GNU Compiler.
+
+
+### Using Docker Compose
+
+You can build all the required tools and dependencies using:
+
+```bash
+$ docker-compose build
+```
+
+And then compile and test using:
+
+```bash
+$ docker-compose run
+```
