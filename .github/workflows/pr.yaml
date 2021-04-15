@@ -57,3 +57,22 @@ jobs:
 
             - name: Run Tests
               run: ./release/tests/GarlicConfigTest
+
+    test-mac:
+        name: Test on Mac
+        runs-on: macos-11.0
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
+
+            - name: Install Build Tools
+              run: pip3 install cmake cget
+
+            - name: Install Dependencies
+              run: sh init.sh
+
+            - name: Build
+              run: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
+
+            - name: Run Tests
+              run: ./release/tests/GarlicConfigTest
