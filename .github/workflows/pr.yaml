@@ -34,7 +34,7 @@ jobs:
 
             - name: Build Library Dependencies from Source.
               run: |
-                  $Env:path = "C:\mingw\bin;C:\Users\circleci\garlic\Scripts\;"
+                  $Env:path = "C:\mingw\bin;C:\Users\runneradmin\garlic\Scripts\;"
                   cget init --std=gnu++0x --static
                   cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
                   mkdir release
