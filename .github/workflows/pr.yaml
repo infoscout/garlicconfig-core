@@ -42,7 +42,6 @@ jobs:
     test-linux:
         name: Test on Linux (Ubuntu)
         runs-on: ubuntu-latest
-        container: peymanmo/many_x64
         steps:
             - name: Checkout Code
               uses: actions/checkout@v2
