@@ -7,7 +7,7 @@ COPY . /project/
 
 RUN pip3 install cget cmake
 
-RUN cget init -p /cget --std=c++11 --shared && apt update && apt install build-essential && \
+RUN cget init -p /cget --std=c++11 --shared && \
     cget install -p /cget && mkdir /build && \
     cd /build && cmake -DBUILD_SHARED_LIB=ON -DCGET_PATH=/cget/cget/cget.cmake /project
 
