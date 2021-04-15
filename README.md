@@ -24,6 +24,32 @@ You just have to make sure cget is initialized to use C++11 and set your preferr
 ## Development
 You need to make sure you have cGet, CMake 3.11 and a GNU Compiler.
 
+### Local
+
+Install cget and cmake if you don't already have them:
+
+```bash
+$ pip install cget cmake
+```
+
+Install all dependencies:
+
+```bash
+$ ./init.sh
+```
+
+Then you can make a build directory and initialize the CMake project:
+
+```bash
+$ mkdir build && cd build && cmake ..
+```
+
+Now you can build and test from the `build` directory:
+
+```bash
+$ make && make test
+```
+
 
 ### Using Docker Compose
 
