@@ -21,15 +21,7 @@ jobs:
                   .\garlic\Scripts\activate.ps1
                   pip install cmake cget
             
-            - name: Cache MinGW Compiler
-              id: cache-mingw
-              uses: actions/cache@v2
-              with:
-                  path: "C:\\mingw"
-                  key: mingw
-
-            - name: Generate Prime Numbers
-              if: steps.cache-mingw.outputs.cache-hit != 'true'
+            - name: Install MinGW Compiler
               run: scripts/install_mingw.ps1
 
             - name: Build Library Dependencies from Source.
@@ -46,3 +38,20 @@ jobs:
               run: |
                   $Env:path = "C:\mingw\bin;"
                   .\release\tests\GarlicConfigTest.exe
+
+    test-linux:
+        name: Test on Linux (Ubuntu)
+        runs-on: ubuntu-latest
+        container: peymanmo/many_x64
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
+
+            - name: Install Dependencies
+              run: sh init.sh
+
+            - name: Build
+              run: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
+
+            - name: Run Tests
+              run: ./release/tests/GarlicConfigTest
