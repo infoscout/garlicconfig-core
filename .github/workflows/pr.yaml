@@ -1,0 +1,47 @@
+name: PR Tests
+
+on:
+    pull_request:
+
+jobs:
+    test-windows:
+        name: Test on Windows
+        runs-on: windows-2019
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
+
+            - name: Install Python, Create Virtual Environment and Install Dependencies.
+              run: |
+                  cd ~
+                  nuget install python -Version 3.8.1 -ExcludeVersion -OutputDirectory .
+                  .\python\tools\python.exe -m pip install virtualenv
+                  .\python\tools\python.exe -m virtualenv garlic
+                  .\garlic\Scripts\activate.ps1
+                  pip install cmake cget
+            
+            - name: Cache MinGW Compiler
+              id: cache-mingw
+              uses: actions/cache@v2
+              with:
+                  path: "C:\\mingw"
+                  key: mingw
+
+            - name: Generate Prime Numbers
+              if: steps.cache-mingw.outputs.cache-hit != 'true'
+              run: scripts/install_mingw.ps1
+
+            - name: Build Library Dependencies from Source.
+              run: |
+                  $Env:path = "C:\mingw\bin;C:\Users\circleci\garlic\Scripts\;"
+                  cget init --std=gnu++0x --static
+                  cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
+                  mkdir release
+                  cd release
+                  cmake .. -G "MinGW Makefiles"
+                  mingw32-make
+
+            - name: Run Tests
+              run: |
+                  $Env:path = "C:\mingw\bin;"
+                  .\release\tests\GarlicConfigTest.exe
