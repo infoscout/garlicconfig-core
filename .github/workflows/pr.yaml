@@ -5,58 +5,58 @@ on:
     pull_request:
 
 jobs:
-    #test-windows:
-    #    name: Test on Windows
-    #    runs-on: windows-2019
-    #    steps:
-    #        - name: Checkout Code
-    #          uses: actions/checkout@v2
+    test-windows:
+        name: Test on Windows
+        runs-on: windows-2019
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
 
-    #        - name: Install Python, Create Virtual Environment and Install Dependencies.
-    #          run: |
-    #              cd ~
-    #              nuget install python -Version 3.8.1 -ExcludeVersion -OutputDirectory .
-    #              .\python\tools\python.exe -m pip install virtualenv
-    #              .\python\tools\python.exe -m virtualenv garlic
-    #              .\garlic\Scripts\activate.ps1
-    #              pip install cmake cget
+            - name: Install Python, Create Virtual Environment and Install Dependencies.
+              run: |
+                  cd ~
+                  nuget install python -Version 3.8.1 -ExcludeVersion -OutputDirectory .
+                  .\python\tools\python.exe -m pip install virtualenv
+                  .\python\tools\python.exe -m virtualenv garlic
+                  .\garlic\Scripts\activate.ps1
+                  pip install cmake cget
             
-    #        - name: Install MinGW Compiler
-    #          run: scripts/install_mingw.ps1
+            - name: Install MinGW Compiler
+              run: scripts/install_mingw.ps1
 
-    #        - name: Build Library Dependencies from Source.
-    #          run: |
-    #              $Env:path = "C:\mingw\bin;C:\Users\runneradmin\garlic\Scripts\;"
-    #              cget init --std=gnu++0x --static
-    #              cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
-    #              mkdir release
-    #              cd release
-    #              cmake .. -G "MinGW Makefiles"
-    #              mingw32-make
+            - name: Build Library Dependencies from Source.
+              run: |
+                  $Env:path = "C:\mingw\bin;C:\Users\runneradmin\garlic\Scripts\;"
+                  cget init --std=gnu++0x --static
+                  cget install -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
+                  mkdir release
+                  cd release
+                  cmake .. -G "MinGW Makefiles"
+                  mingw32-make
 
-    #        - name: Run Tests
-    #          run: |
-    #              $Env:path = "C:\mingw\bin;"
-    #              .\release\tests\GarlicConfigTest.exe
+            - name: Run Tests
+              run: |
+                  $Env:path = "C:\mingw\bin;"
+                  .\release\tests\GarlicConfigTest.exe
 
-    #test-linux:
-    #    name: Test on Linux (Ubuntu)
-    #    runs-on: ubuntu-latest
-    #    steps:
-    #        - name: Checkout Code
-    #          uses: actions/checkout@v2
+    test-linux:
+        name: Test on Linux (Ubuntu)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
 
-    #        - name: Install Build Tools
-    #          run: pip3 install cmake cget
+            - name: Install Build Tools
+              run: pip3 install cmake cget
 
-    #        - name: Install Dependencies
-    #          run: sh init.sh
+            - name: Install Dependencies
+              run: sh init.sh
 
-    #        - name: Build
-    #          run: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
+            - name: Build
+              run: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
 
-    #        - name: Run Tests
-    #          run: ./release/tests/GarlicConfigTest
+            - name: Run Tests
+              run: ./release/tests/GarlicConfigTest
 
     test-mac:
         name: Test on Mac
@@ -75,7 +75,3 @@ jobs:
               run: |
                   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64
                   mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
-
-            - name: Run Tests
-              run: |
-                  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64 ./release/tests/GarlicConfigTest
