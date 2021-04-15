@@ -1,8 +1,5 @@
 # GarlicConfig
 
-[![CircleCI](https://circleci.com/gh/infoscout/garlicconfig-core.svg?style=svg&circle-token=0fa1ed375c058bb98d7d2dc3e1bf871a9c6706fd)](https://circleci.com/gh/infoscout/garlicconfig-core)
-
-
 C++ library to quickly read, write and merge garlic config layers. Note that this library does not include any validation logic.
 
 ## Integration
