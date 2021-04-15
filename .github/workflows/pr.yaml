@@ -46,6 +46,9 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v2
 
+            - name: Install Build Tools
+              run: pip3 install cmake cget
+
             - name: Install Dependencies
               run: sh init.sh
 
