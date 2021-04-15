@@ -53,6 +53,7 @@ $ make && make test
 $ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64
 ```
 
+> NOTE: Alternatively instead of `init.sh` you can use `scripts/build.sh` to do all the above in one command.
 
 ### Using Docker Compose
 
