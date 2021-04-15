@@ -50,7 +50,7 @@ $ make && make test
 > NOTE: For folks on macOS using AppleClang, you need to do this prior to building:
 
 ```bash
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64
+$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64
 ```
 
 
