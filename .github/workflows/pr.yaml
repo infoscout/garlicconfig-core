@@ -73,7 +73,7 @@ jobs:
 
             - name: Build
               run: |
-                  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64'
+                  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64
                   mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
 
             - name: Run Tests
