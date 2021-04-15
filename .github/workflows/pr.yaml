@@ -71,6 +71,9 @@ jobs:
             - name: Install Dependencies
               run: sh init.sh
 
+            - name: Update LD_LIBRARY_PATH
+              run: echo '::set-env name=LD_LIBRARY_PATH::$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64'
+
             - name: Build
               run: mkdir release && cd release && cmake .. -DBUILD_SHARED_LIB=ON && make
 
